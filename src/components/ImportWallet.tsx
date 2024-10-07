@@ -18,11 +18,11 @@ const ImportWallet = () => {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-[#1E1E1E] text-white p-4">
+    <div className="flex flex-col items-center justify-center h-[80vh] bg-black text-white">
       <h1 className="text-3xl font-bold mb-8 text-[#54A9EB]">
         Import Existing Wallet
       </h1>
-      <form onSubmit={handleSubmit} className="space-y-4 w-full max-w-md">
+      <form onSubmit={handleSubmit} className="my-auto w-full ">
         <Textarea
           placeholder="Enter your 12-word seed phrase"
           value={seedPhrase}

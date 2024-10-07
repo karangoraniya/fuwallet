@@ -1,10 +1,10 @@
-import InitialScreen from "@/components/InitialScreen";
+import CreateWallet from "@/components/CreateWallet";
 import React from "react";
 
 const page = () => {
   return (
     <div>
-      <InitialScreen />
+      <CreateWallet />
     </div>
   );
 };
