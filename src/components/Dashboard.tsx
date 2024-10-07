@@ -140,7 +140,9 @@ export default function Dashboard() {
           </div>
           <div className="flex flex-col items-center space-y-2 mb-4">
             <div className="flex items-center space-x-2">
-              <p className="text-sm text-gray-600">B256: {truncateAddress(b256Address)}</p>
+              <p className="text-sm text-gray-600">
+                B256: {truncateAddress(b256Address)}
+              </p>
               <Button
                 variant="ghost"
                 size="icon"
@@ -151,7 +153,9 @@ export default function Dashboard() {
               </Button>
             </div>
             <div className="flex items-center space-x-2">
-              <p className="text-sm text-gray-600">Fuel: {truncateAddress(fuelAddress)}</p>
+              <p className="text-sm text-gray-600">
+                Fuel: {truncateAddress(fuelAddress)}
+              </p>
               <Button
                 variant="ghost"
                 size="icon"
@@ -234,7 +238,9 @@ export default function Dashboard() {
           </DialogHeader>
           <div className="space-y-4 flex flex-col items-center">
             <QRCode value={fuelAddress} size={200} />
-            <p className="text-sm text-gray-600 text-center break-all">{fuelAddress}</p>
+            <p className="text-sm text-gray-600 text-center break-all">
+              {fuelAddress}
+            </p>
             <Button
               className="w-full bg-indigo-600 hover:bg-indigo-700 text-white"
               onClick={() => copyToClipboard(fuelAddress, "Fuel")}
@@ -244,7 +250,6 @@ export default function Dashboard() {
           </div>
         </DialogContent>
       </Dialog>
-
     </div>
   );
 }

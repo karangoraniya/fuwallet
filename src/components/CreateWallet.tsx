@@ -26,6 +26,10 @@ const CreateWallet: React.FC = () => {
 
       // Store in local storage
       localStorage.setItem("seedPhrase", mnemonic);
+      localStorage.setItem(
+        "fuelwalletAddress",
+        myWalletSeed.address.toString()
+      );
       localStorage.setItem("walletAddress", walletAddress);
       localStorage.setItem("privateKey", privateKey);
 
@@ -57,11 +61,11 @@ const CreateWallet: React.FC = () => {
         >
           {isCopied ? (
             <>
-              <CopyCheck /> 
+              <CopyCheck />
             </>
           ) : (
             <>
-              <Copy /> 
+              <Copy />
             </>
           )}
         </Button>
