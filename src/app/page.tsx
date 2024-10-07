@@ -1,101 +1,129 @@
-import Image from "next/image";
+import { useState } from "react";
+import QRCode from "react-qr-code";
+import { Settings, Scan, Copy, Send, Plus } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  // DialogTrigger,
+} from "@/components/ui/dialog";
 
-export default function Home() {
+export default function CryptoWallet() {
+  const [showTransferDialog, setShowTransferDialog] = useState(false);
+  const [address] = useState("0x1234...5678");
+  const [balance] = useState("1.2345 ETH");
+  const [tokens] = useState([
+    { name: "Ethereum", symbol: "ETH", balance: "1.2345" },
+    { name: "Bitcoin", symbol: "BTC", balance: "0.1234" },
+    { name: "Cardano", symbol: "ADA", balance: "100.00" },
+  ]);
+
   return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="https://nextjs.org/icons/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-semibold">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
-
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+    <div className="min-h-screen bg-gradient-to-br from-purple-500 to-indigo-600 flex items-center justify-center p-4">
+      <div className="bg-white rounded-3xl shadow-2xl p-8 w-full max-w-md">
+        <div className="flex justify-between items-center mb-8">
+          <Button
+            variant="ghost"
+            size="icon"
+            className="text-gray-600 hover:text-gray-900"
           >
-            <Image
-              className="dark:invert"
-              src="https://nextjs.org/icons/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:min-w-44"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+            <Settings className="h-6 w-6" />
+          </Button>
+          <h1 className="text-2xl font-bold text-center text-gray-800">
+            Crypto Wallet
+          </h1>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="text-gray-600 hover:text-gray-900"
           >
-            Read our docs
-          </a>
+            <Scan className="h-6 w-6" />
+          </Button>
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+
+        <div className="bg-gray-100 rounded-2xl p-6 mb-8">
+          <div className="text-center mb-4">
+            <p className="text-sm text-gray-600 mb-1">Total Balance</p>
+            <h2 className="text-4xl font-bold text-gray-900">{balance}</h2>
+          </div>
+          <div className="flex items-center justify-center space-x-2 mb-4">
+            <p className="text-sm text-gray-600">{address}</p>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="text-gray-600 hover:text-gray-900"
+            >
+              <Copy className="h-4 w-4" />
+            </Button>
+          </div>
+          <div className="flex justify-center">
+            <QRCode value={address} size={128} />
+          </div>
+        </div>
+
+        <div className="space-y-4 mb-8">
+          {tokens.map((token, index) => (
+            <div
+              key={index}
+              className="flex justify-between items-center bg-gray-50 rounded-xl p-4"
+            >
+              <div>
+                <p className="font-semibold text-gray-800">{token.name}</p>
+                <p className="text-sm text-gray-600">{token.symbol}</p>
+              </div>
+              <p className="font-bold text-gray-800">{token.balance}</p>
+            </div>
+          ))}
+        </div>
+
+        <div className="flex space-x-4">
+          <Button
+            className="flex-1 bg-purple-600 hover:bg-purple-700 text-white"
+            onClick={() => setShowTransferDialog(true)}
+          >
+            <Send className="h-4 w-4 mr-2" />
+            Send
+          </Button>
+          <Button className="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white">
+            <Plus className="h-4 w-4 mr-2" />
+            Receive
+          </Button>
+        </div>
+      </div>
+
+      <Dialog open={showTransferDialog} onOpenChange={setShowTransferDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Transfer Funds</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div>
+              <label
+                htmlFor="recipient"
+                className="block text-sm font-medium text-gray-700 mb-1"
+              >
+                Recipient Address
+              </label>
+              <Input id="recipient" placeholder="Enter recipient address" />
+            </div>
+            <div>
+              <label
+                htmlFor="amount"
+                className="block text-sm font-medium text-gray-700 mb-1"
+              >
+                Amount
+              </label>
+              <Input id="amount" type="number" placeholder="Enter amount" />
+            </div>
+            <Button className="w-full bg-purple-600 hover:bg-purple-700 text-white">
+              Confirm Transfer
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
