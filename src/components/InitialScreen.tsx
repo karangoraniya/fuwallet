@@ -1,24 +1,38 @@
 "use client";
+
 import Link from "next/link";
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Button } from "./ui/button";
-import { ArrowUpRight } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 const InitialScreen = () => {
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
+  const router = useRouter();
 
   useEffect(() => {
-    const handleMouseMove = (e: MouseEvent) => {
+    const handleMouseMove = (e: any) => {
       setMousePosition({ x: e.clientX, y: e.clientY });
     };
 
     window.addEventListener("mousemove", handleMouseMove);
 
+    const checkWalletData = () => {
+      const seedPhrase = localStorage.getItem("seedPhrase");
+      const walletAddress = localStorage.getItem("walletAddress");
+      const privateKey = localStorage.getItem("privateKey");
+
+      if (seedPhrase && walletAddress && privateKey) {
+        router.push("/dashboard");
+      }
+    };
+
+    checkWalletData();
+
     return () => {
       window.removeEventListener("mousemove", handleMouseMove);
     };
-  }, []);
+  }, [router]);
 
   return (
     <div>
@@ -44,11 +58,8 @@ const InitialScreen = () => {
                 </Button>
               </Link>
               <Link href="/import-wallet">
-                <Button
-                  className="p-5 bg-gradient-to-r from-green-500 to-green-700 text-white font-semibold md:text-lg shadow-lg hover:shadow-xl transition-all duration-300 text-sm
-                  "
-                >
-                  <div>Import Wallet</div>
+                <Button className="p-5 bg-gradient-to-r from-green-500 to-green-700 text-white font-semibold md:text-lg shadow-lg hover:shadow-xl transition-all duration-300 text-sm">
+                  Import Wallet
                 </Button>
               </Link>
             </div>
