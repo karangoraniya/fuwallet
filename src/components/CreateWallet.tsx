@@ -21,15 +21,13 @@ const CreateWallet: React.FC = () => {
       setSeedPhrase(mnemonic);
 
       const myWalletSeed: WalletUnlocked = Wallet.fromMnemonic(mnemonic);
-      const walletAddress = myWalletSeed.address.toString();
+      const walletAddress = myWalletSeed.address.toB256();
+      const fuWalletAddress = myWalletSeed.address.toString();
       const privateKey = myWalletSeed.privateKey;
 
       // Store in local storage
       localStorage.setItem("seedPhrase", mnemonic);
-      localStorage.setItem(
-        "fuelwalletAddress",
-        myWalletSeed.address.toString()
-      );
+      localStorage.setItem("fuelwalletAddress", fuWalletAddress);
       localStorage.setItem("walletAddress", walletAddress);
       localStorage.setItem("privateKey", privateKey);
 
