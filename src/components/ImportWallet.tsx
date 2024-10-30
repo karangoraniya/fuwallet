@@ -17,7 +17,7 @@ const ImportWallet = () => {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center max-h-screen h-[90dvh] overflow-y-hidden bg-gray-900 text-white gap-4">
+    <div className="flex flex-col items-center justify-center max-h-screen h-[90dvh] overflow-y-hidden bg-gray-900 text-white gap-4 p-4 md:p-0">
       <h1 className="text-3xl font-bold mb-8 text-[#54A9EB]">
         Import Existing Wallet
       </h1>

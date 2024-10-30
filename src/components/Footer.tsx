@@ -1,4 +1,4 @@
-'use client'
+"use client";
 import React, { useEffect, useState } from "react";
 
 const Footer = () => {
@@ -12,11 +12,13 @@ const Footer = () => {
         window.requestAnimationFrame(() => {
           const windowHeight = window.innerHeight;
           const documentHeight = document.documentElement.scrollHeight;
-          const scrollTop = window.scrollY || document.documentElement.scrollTop;
-          
+          const scrollTop =
+            window.scrollY || document.documentElement.scrollTop;
+
           // Add a small buffer (20px) to account for potential rounding
-          const isFooterAtBottom = windowHeight + scrollTop >= documentHeight - 20;
-          
+          const isFooterAtBottom =
+            windowHeight + scrollTop >= documentHeight - 20;
+
           setIsAtBottom(isFooterAtBottom);
           setIsScrolling(false);
         });
@@ -50,16 +52,18 @@ const Footer = () => {
         duration-300 
         ease-in-out 
         z-40
-        ${isAtBottom 
-          ? 'bg-transparent text-blue-600' 
-          : 'bg-gray-800/80 text-white backdrop-blur-sm'
+        ${
+          isAtBottom
+            ? "bg-transparent text-blue-600"
+            : "bg-gray-800/80 text-white backdrop-blur-sm"
         }
       `}
     >
       <div className="container mx-auto">
         <p className="text-sm md:text-base">
-          &copy; {new Date().getFullYear()} Made with{' '}
-          <span className="inline-block animate-pulse">💖</span>
+          &copy; {new Date().getFullYear()} Made with{" "}
+          <span className="inline-block animate-pulse">💖</span> by
+          CryptoKarigar
         </p>
       </div>
     </footer>

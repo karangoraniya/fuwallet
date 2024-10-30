@@ -9,14 +9,16 @@ import { Copy, CopyCheck } from "lucide-react";
 const CreateWallet: React.FC = () => {
   const [seedPhrase, setSeedPhrase] = useState<string>("");
   const [isCopied, setIsCopied] = useState(false);
+  const [loading, setLoading] = useState(false); 
   const router = useRouter();
 
   useEffect(() => {
     createWallet();
   }, []);
 
-  const createWallet = () => {
+  const createWallet = async () => {
     try {
+      setLoading(true); 
       const mnemonic = generateMnemonic(english);
       setSeedPhrase(mnemonic);
 
@@ -30,8 +32,11 @@ const CreateWallet: React.FC = () => {
       localStorage.setItem("privateKey", privateKey);
 
       console.log("Wallet created and stored in local storage");
+      setLoading(false); 
+      router.push("/dashboard"); // Navigate to dashboard
     } catch (error) {
       console.error("Error creating wallet:", error);
+      setLoading(false); // Ensure loading is false on error
     }
   };
 
@@ -48,34 +53,44 @@ const CreateWallet: React.FC = () => {
         Your Seed Phrase
       </h1>
       <div className="bg-[#2C2C2C] p-6 rounded-md mb-8 w-full max-w-md">
-        <p className="text-center font-mono text-[#54A9EB] break-words mb-4">
-          {seedPhrase}
-        </p>
-        <Button
-          onClick={copyToClipboard}
-          className="w-fit bg-[#54A9EB] hover:bg-[#4A94D1] text-white mt-4 p-2"
-        >
-          {isCopied ? (
-            <>
-              <CopyCheck /> 
-            </>
-          ) : (
-            <>
-              <Copy /> 
-            </>
-          )}
-        </Button>
+        {loading ? ( // Show loading spinner or message
+          <p className="text-center font-mono text-[#54A9EB]">Creating wallet...</p>
+        ) : (
+          <>
+            <p className="text-center font-mono text-[#54A9EB] break-words mb-4">
+              {seedPhrase}
+            </p>
+            <Button
+              onClick={copyToClipboard}
+              className="w-fit bg-[#54A9EB] hover:bg-[#4A94D1] text-white mt-4 p-2"
+            >
+              {isCopied ? (
+                <>
+                  <CopyCheck /> 
+                </>
+              ) : (
+                <>
+                  <Copy /> 
+                </>
+              )}
+            </Button>
+          </>
+        )}
       </div>
-      <p className="text-sm text-center mb-8 max-w-md">
-        Write down this seed phrase and store it in a safe place. You will need
-        it to recover your wallet.
-      </p>
-      <Button
-        onClick={() => router.push("/dashboard")}
-        className="w-full max-w-xs bg-[#54A9EB] hover:bg-[#4A94D1] text-white"
-      >
-        I have Saved My Seed Phrase
-      </Button>
+      {!loading && (
+        <p className="text-sm text-center mb-8 max-w-md">
+          Write down this seed phrase and store it in a safe place. You will need
+          it to recover your wallet.
+        </p>
+      )}
+      {!loading && (
+        <Button
+          onClick={() => router.push("/dashboard")}
+          className="w-full max-w-xs bg-[#54A9EB] hover:bg-[#4A94D1] text-white"
+        >
+          I have Saved My Seed Phrase
+        </Button>
+      )}
     </div>
   );
 };

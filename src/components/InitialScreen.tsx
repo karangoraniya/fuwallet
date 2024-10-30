@@ -5,27 +5,14 @@ import Link from "next/link"
 import { useEffect, useState, useCallback } from "react"
 import { motion } from "framer-motion"
 import { useRouter } from "next/navigation"
+import BenefitCard from "@/components/BenefitCard"
+import FeatureCard from "@/components/FeatureCard"
+import StepCard from "@/components/StepCard"
 interface Position {
   x: number
   y: number
 }
 
-interface FeatureCardProps {
-  icon: JSX.Element
-  title: string
-  description: string
-}
-
-interface StepCardProps {
-  number: number
-  title: string
-  description: string
-}
-
-interface BenefitCardProps {
-  title: string
-  description: string
-}
 
 export default function FuwalletHomepage() {
   const [mousePosition, setMousePosition] = useState<Position>({ x: 0, y: 0 })
@@ -201,18 +188,10 @@ export default function FuwalletHomepage() {
       <section className="bg-gray-800 py-20">
         <div className="container mx-auto px-4">
           <h2 className="mb-12 text-center text-4xl font-bold">Why Choose Fuwallet</h2>
-          <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-4">
+          <div className="flex items-center justify-center gap-5">
             <BenefitCard
               title="User-Friendly Interface"
               description="Intuitive design for both beginners and experts"
-            />
-            <BenefitCard
-              title="Multi-Device Sync"
-              description="Access your wallet across all your devices"
-            />
-            <BenefitCard
-              title="24/7 Support"
-              description="Get help whenever you need it, day or night"
             />
             <BenefitCard
               title="Regular Updates"
@@ -225,35 +204,7 @@ export default function FuwalletHomepage() {
   )
 }
 
-function FeatureCard({ icon, title, description }: FeatureCardProps) {
-  return (
-    <div className="group flex flex-col items-center rounded-lg bg-gray-700 p-6 text-center transition-all duration-300 hover:scale-105 hover:shadow-xl">
-      <div className="transform transition-transform duration-300 group-hover:scale-110">
-        {icon}
-      </div>
-      <h3 className="mt-4 text-xl font-semibold">{title}</h3>
-      <p className="mt-2 text-gray-400">{description}</p>
-    </div>
-  )
-}
 
-function StepCard({ number, title, description }: StepCardProps) {
-  return (
-    <div className="group flex flex-col items-center rounded-lg bg-gray-800 p-6 text-center transition-all duration-300 hover:scale-105 hover:shadow-xl">
-      <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-blue-500 text-2xl font-bold transition-transform duration-300 group-hover:scale-110">
-        {number}
-      </div>
-      <h3 className="text-xl font-semibold">{title}</h3>
-      <p className="mt-2 text-gray-400">{description}</p>
-    </div>
-  )
-}
 
-function BenefitCard({ title, description }: BenefitCardProps) {
-  return (
-    <div className="group rounded-lg bg-gray-700 p-6 text-center transition-all duration-300 hover:scale-105 hover:shadow-xl">
-      <h3 className="text-xl font-semibold">{title}</h3>
-      <p className="mt-2 text-gray-400">{description}</p>
-    </div>
-  )
-}
+
+
