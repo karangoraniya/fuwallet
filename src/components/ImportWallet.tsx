@@ -13,16 +13,15 @@ const ImportWallet = () => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // Here you would typically validate the seed phrase and create the wallet
     router.push("/dashboard");
   };
 
   return (
-    <div className="flex flex-col items-center justify-center h-[80vh] bg-black text-white">
+    <div className="flex flex-col items-center justify-center max-h-screen h-[90dvh] overflow-y-hidden bg-gray-900 text-white gap-4">
       <h1 className="text-3xl font-bold mb-8 text-[#54A9EB]">
         Import Existing Wallet
       </h1>
-      <form onSubmit={handleSubmit} className="my-auto w-full ">
+      <form onSubmit={handleSubmit} className="mb-8 w-full max-w-md flex flex-col gap-5">
         <Textarea
           placeholder="Enter your 12-word seed phrase"
           value={seedPhrase}

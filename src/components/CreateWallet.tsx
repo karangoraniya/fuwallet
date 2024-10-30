@@ -43,7 +43,7 @@ const CreateWallet: React.FC = () => {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-[#1E1E1E] text-white p-4">
+    <div className="flex flex-col items-center justify-center max-h-screen h-[90dvh] overflow-y-hidden bg-gray-900 text-white p-4">
       <h1 className="text-3xl font-bold mb-8 text-[#54A9EB]">
         Your Seed Phrase
       </h1>

@@ -4,7 +4,7 @@ import React from "react";
 const Navbar = () => {
   return (
     <div>
-      <header className="p-6 bg-black">
+      <header className="p-6 bg-gray-900">
         <nav className="flex justify-between items-center">
           <Link href="/">
             <h1 className="text-3xl font-bold text-blue-600">FuWallet</h1>
