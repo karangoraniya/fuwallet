@@ -1,28 +1,47 @@
 "use client";
-import { useState, useEffect } from "react";
+import React, { useState, useEffect, use } from "react";
 import { Provider, Wallet, BN } from "fuels";
 import QRCode from "react-qr-code";
-import { Settings, Scan, Copy, Send, Plus, X } from "lucide-react";
+import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { SuccessTransactionDialog } from "@/components/SuccessTransactionDialog";
+
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { toast } from "react-hot-toast";
+import { toast, Toaster } from "react-hot-toast";
+import {
+  Send,
+  QrCode,
+  Copy,
+  ExternalLink,
+  Eye,
+  Plus,
+  Wallet as WalletIcon,
+  Check,
+  Loader2,
+} from "lucide-react";
+import Image from "next/image";
+import Link from "next/link";
+import ETH from "@/images";
 
-export default function Dashboard() {
+const FuelWallet = () => {
   const [balance, setBalance] = useState(0);
   const [b256Address, setB256Address] = useState("");
   const [fuelAddress, setFuelAddress] = useState("");
   const [showTransferDialog, setShowTransferDialog] = useState(false);
   const [showReceiveDialog, setShowReceiveDialog] = useState(false);
-  const [showScannerDialog, setShowScannerDialog] = useState(false);
   const [recipientAddress, setRecipientAddress] = useState("");
   const [amount, setAmount] = useState("");
   const [privateKey, setPrivateKey] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const [showSuccessDialog, setShowSuccessDialog] = useState(false);
+  const [txHash, setTxHash] = useState("");
+  const [isValidInput, setIsValidInput] = useState(false);
 
   const TESTNET_URL = "https://testnet.fuel.network/v1/graphql";
 
@@ -40,7 +59,7 @@ export default function Dashboard() {
         try {
           const provider = await Provider.create(TESTNET_URL);
           const myWallet = Wallet.fromPrivateKey(storedPrivateKey, provider);
-          const balanceBN: BN = await myWallet.getBalance(
+          const balanceBN = await myWallet.getBalance(
             provider.getBaseAssetId()
           );
           setBalance(Number(balanceBN.format({ precision: 9 })));
@@ -56,6 +75,22 @@ export default function Dashboard() {
 
   const truncateAddress = (address: string) => {
     return `${address.slice(0, 6)}...${address.slice(-4)}`;
+  };
+
+  // Add validation function
+  const validateInput = (address: string, amount: string) => {
+    return address.trim() !== "" && Number(amount) > 0;
+  };
+
+  // Update input handlers
+  const handleAddressChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setRecipientAddress(e.target.value);
+    setIsValidInput(validateInput(e.target.value, amount));
+  };
+
+  const handleAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setAmount(e.target.value);
+    setIsValidInput(validateInput(recipientAddress, e.target.value));
   };
 
   const copyToClipboard = (text: string, type: string) => {
@@ -80,15 +115,8 @@ export default function Dashboard() {
       });
   };
 
-  const handleScan = (result: string | null) => {
-    if (result) {
-      setRecipientAddress(result);
-      setShowScannerDialog(false);
-      setShowTransferDialog(true);
-    }
-  };
-
   const handleTransfer = async () => {
+    setIsLoading(true);
     try {
       const provider = await Provider.create(TESTNET_URL);
       const sender = Wallet.fromPrivateKey(privateKey, provider);
@@ -101,91 +129,153 @@ export default function Dashboard() {
       );
 
       const tx = await response.wait();
+      setTxHash(tx.id);
       console.log(tx);
-      toast.success("Transfer successful!");
+      console.log(tx.id, "id");
+
+      // Update balance
+      const newBalanceBN = await sender.getBalance(baseAssetId);
+      setBalance(Number(newBalanceBN.format({ precision: 9 })));
+
+      // Close transfer dialog and show success
       setShowTransferDialog(false);
+      setShowSuccessDialog(true);
+
+      // Reset form
       setRecipientAddress("");
       setAmount("");
+      setIsValidInput(false);
 
-      // Refresh balance after transfer
-      const newBalanceBN: BN = await sender.getBalance(baseAssetId);
-      setBalance(Number(newBalanceBN.format({ precision: 9 })));
+      // Add a timeout to auto-close success dialog
+      setTimeout(() => {
+        setShowSuccessDialog(false);
+      }, 5000); // 5 seconds
     } catch (error) {
       console.error("Transfer error:", error);
       toast.error("Transfer failed. Please try again.");
+    } finally {
+      setIsLoading(false);
     }
   };
 
+  const renderAssets = () => {
+    if (balance > 0) {
+      return (
+        <Card className="bg-zinc-900 border-zinc-800">
+          <CardContent className="p-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-full bg-blue-600 flex items-center justify-center">
+                  <Image
+                    src={ETH}
+                    alt="ETH"
+                    className="w-6 h-6"
+                    width={100}
+                    height={100}
+                  />
+                </div>
+                <div>
+                  <h3 className="text-lg text-white font-medium">Ethereum</h3>
+                  <p className="text-sm text-zinc-400">ETH</p>
+                </div>
+              </div>
+              <p className="text-lg text-white">{balance} ETH</p>
+            </div>
+          </CardContent>
+        </Card>
+      );
+    }
+
+    return (
+      <Card className="bg-zinc-900 border-zinc-800">
+        <CardContent className="p-6">
+          <div className="text-center">
+            <p className="text-xl text-white mb-2">You don't have any assets</p>
+            <p className="text-zinc-400 mb-4">Start depositing some assets</p>
+            <Button className="bg-emerald-400 hover:bg-emerald-500 text-black">
+              <WalletIcon className="w-4 h-4 mr-2" />
+              Bridge to Fuel
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  };
+
   return (
-    <div className="h-[80vh] flex items-center justify-center bg-black">
-      <div className="bg-white rounded-3xl shadow-2xl p-4 w-full max-w-md">
-        <div className="flex justify-between items-center mb-8">
-          <h1 className="text-2xl font-bold text-center text-gray-800">
-            FulWallet
-          </h1>
-          <Button
-            variant="ghost"
-            size="icon"
-            className="text-gray-600 hover:text-gray-900"
-            onClick={() => setShowScannerDialog(true)}
-          >
-            <Scan className="h-6 w-6" />
-          </Button>
+    <div className="bg-black min-h-screen text-white p-4">
+      <Toaster position="top-right" />
+      {/* Header */}
+      <div className="flex items-center justify-between mb-8">
+        <div className="flex items-center gap-2">
+          <div className="w-8 h-8 bg-emerald-400 rounded-lg" />
+          <span className="text-lg font-medium">FuWallet</span>
         </div>
+      </div>
 
-        <div className="bg-gray-100 rounded-2xl p-6 mb-8">
-          <div className="text-center mb-4">
-            <p className="text-sm text-gray-600 mb-1">Balance</p>
-            <h2 className="text-2xl font-bold text-gray-900">{balance} ETH</h2>
-          </div>
-          <div className="flex flex-col items-center space-y-2 mb-4">
-            <div className="flex items-center space-x-2">
-              <p className="text-sm text-gray-600">
-                B256: {truncateAddress(b256Address)}
-              </p>
-              <Button
-                variant="ghost"
-                size="icon"
-                className="text-gray-600 hover:text-gray-900"
-                onClick={() => copyToClipboard(b256Address, "B256")}
-              >
-                <Copy className="h-4 w-4" />
-              </Button>
-            </div>
-            <div className="flex items-center space-x-2">
-              <p className="text-sm text-gray-600">
-                Fuel: {truncateAddress(fuelAddress)}
-              </p>
-              <Button
-                variant="ghost"
-                size="icon"
-                className="text-gray-600 hover:text-gray-900"
-                onClick={() => copyToClipboard(fuelAddress, "Fuel")}
-              >
-                <Copy className="h-4 w-4" />
-              </Button>
+      {/* Account Section */}
+      <Card className="bg-zinc-900 border-zinc-800 mb-6">
+        <CardContent className="p-4">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-emerald-700 to-blue-700" />
+            <div>
+              <div className="flex items-center gap-2">
+                <span className="text-sm text-zinc-400">
+                  B256: {truncateAddress(b256Address)}
+                </span>
+                <button
+                  onClick={() => copyToClipboard(b256Address, "B256")}
+                  className="text-zinc-400 hover:text-white"
+                >
+                  <Copy className="w-4 h-4" />
+                </button>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="text-sm text-zinc-400">
+                  Fuel: {truncateAddress(fuelAddress)}
+                </span>
+                <button
+                  onClick={() => copyToClipboard(fuelAddress, "Fuel")}
+                  className="text-zinc-400 hover:text-white"
+                >
+                  <Copy className="w-4 h-4" />
+                </button>
+              </div>
             </div>
           </div>
+        </CardContent>
+      </Card>
+
+      {/* Balance Section */}
+      <div className="mb-6">
+        <h3 className="text-zinc-400 mb-2">Balance</h3>
+        <div className="flex items-center gap-2 text-3xl font-medium mb-4">
+          <span>ETH</span>
+          <span>{balance}</span>
+          <Eye className="w-6 h-6 text-zinc-400" />
         </div>
 
-        <div className="flex space-x-4">
+        <div className="grid grid-cols-2 gap-4">
           <Button
-            className="flex-1 bg-purple-600 hover:bg-purple-700 text-white"
             onClick={() => setShowTransferDialog(true)}
+            variant="outline"
+            className="bg-black hover:bg-zinc-900 text-white border-zinc-700 py-6 hover:border-zinc-600"
           >
-            <Send className="h-4 w-4 mr-2" />
+            <Send className="w-5 h-5 mr-2" />
             Send
           </Button>
           <Button
-            className="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white"
             onClick={() => setShowReceiveDialog(true)}
+            variant="outline"
+            className="border-zinc-700 py-6 text-black"
           >
-            <Plus className="h-4 w-4 mr-2" />
+            <Plus className="w-5 h-5 mr-2" />
             Receive
           </Button>
         </div>
       </div>
 
+      {/* Transfer Dialog */}
       <Dialog open={showTransferDialog} onOpenChange={setShowTransferDialog}>
         <DialogContent>
           <DialogHeader>
@@ -193,44 +283,53 @@ export default function Dashboard() {
           </DialogHeader>
           <div className="space-y-4">
             <div>
-              <label
-                htmlFor="recipient"
-                className="block text-sm font-medium text-gray-700 mb-1"
-              >
+              <label className="block text-sm font-medium mb-1">
                 Recipient Address
               </label>
               <Input
-                id="recipient"
                 value={recipientAddress}
-                onChange={(e) => setRecipientAddress(e.target.value)}
+                onChange={handleAddressChange}
                 placeholder="Enter recipient address"
+                disabled={isLoading}
               />
             </div>
             <div>
-              <label
-                htmlFor="amount"
-                className="block text-sm font-medium text-gray-700 mb-1"
-              >
-                Amount
-              </label>
+              <label className="block text-sm font-medium mb-1">Amount</label>
               <Input
-                id="amount"
                 type="number"
                 value={amount}
-                onChange={(e) => setAmount(e.target.value)}
+                onChange={handleAmountChange}
                 placeholder="Enter amount"
+                disabled={isLoading}
               />
             </div>
             <Button
-              className="w-full bg-purple-600 hover:bg-purple-700 text-white"
+              className="w-full bg-emerald-400 hover:bg-emerald-500 text-black"
               onClick={handleTransfer}
+              disabled={isLoading || !isValidInput}
             >
-              Confirm Transfer
+              {isLoading ? (
+                <>
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  Processing...
+                </>
+              ) : (
+                "Confirm Transfer"
+              )}
             </Button>
           </div>
         </DialogContent>
       </Dialog>
 
+      <div>
+        <div className="flex items-center gap-2 mb-4">
+          <WalletIcon className="w-5 h-5 text-emerald-400" />
+          <h3 className="text-xl font-medium">Assets</h3>
+        </div>
+        {renderAssets()}
+      </div>
+
+      {/* Receive Dialog */}
       <Dialog open={showReceiveDialog} onOpenChange={setShowReceiveDialog}>
         <DialogContent>
           <DialogHeader>
@@ -238,11 +337,11 @@ export default function Dashboard() {
           </DialogHeader>
           <div className="space-y-4 flex flex-col items-center">
             <QRCode value={fuelAddress} size={200} />
-            <p className="text-sm text-gray-600 text-center break-all">
+            <p className="text-sm text-zinc-400 text-center break-all">
               {fuelAddress}
             </p>
             <Button
-              className="w-full bg-indigo-600 hover:bg-indigo-700 text-white"
+              className="w-full bg-emerald-400 hover:bg-emerald-500 text-black"
               onClick={() => copyToClipboard(fuelAddress, "Fuel")}
             >
               Copy Address
@@ -250,6 +349,14 @@ export default function Dashboard() {
           </div>
         </DialogContent>
       </Dialog>
+
+      <SuccessTransactionDialog
+        isOpen={showSuccessDialog}
+        onClose={setShowSuccessDialog}
+        txHash={txHash}
+      />
     </div>
   );
-}
+};
+
+export default FuelWallet;
