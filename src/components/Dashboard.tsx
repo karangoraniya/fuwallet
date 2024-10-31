@@ -221,7 +221,7 @@ const FuelWallet = () => {
             <div>
               <div className="flex items-center gap-2">
                 <span className="text-sm text-zinc-400">
-                  B256: {truncateAddress(b256Address)}
+                  EVM: {truncateAddress(b256Address)}
                 </span>
                 <button
                   onClick={() => copyToClipboard(b256Address, "B256")}
